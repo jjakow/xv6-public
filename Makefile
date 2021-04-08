@@ -29,7 +29,7 @@ OBJS = \
 	vm.o\
 
 # Cross-compiling (e.g., on Mac OS X)
-# TOOLPREFIX = i386-jos-elf
+ TOOLPREFIX = i386-elf-
 
 # Using native tools (e.g., on X86 Linux)
 #TOOLPREFIX = 
@@ -76,7 +76,8 @@ AS = $(TOOLPREFIX)gas
 LD = $(TOOLPREFIX)ld
 OBJCOPY = $(TOOLPREFIX)objcopy
 OBJDUMP = $(TOOLPREFIX)objdump
-CFLAGS = -fno-pic -static -fno-builtin -fno-strict-aliasing -O2 -Wall -MD -ggdb -m32 -Werror -fno-omit-frame-pointer
+CFLAGS = -fno-pic -static -fno-builtin -fno-strict-aliasing -O0 -Wall -MD -ggdb -m32 -Werror -fno-omit-frame-pointer
+
 CFLAGS += $(shell $(CC) -fno-stack-protector -E -x c /dev/null >/dev/null 2>&1 && echo -fno-stack-protector)
 ASFLAGS = -m32 -gdwarf-2 -Wa,-divide
 # FreeBSD ld wants ``elf_i386_fbsd''
@@ -146,14 +147,21 @@ vectors.S: vectors.pl
 ULIB = ulib.o usys.o printf.o umalloc.o
 
 _%: %.o $(ULIB)
-	$(LD) $(LDFLAGS) -N -e main -Ttext 0 -o $@ $^
+	#compiler ahs to know how programs will be loaded in (work with OS on how b9naries will be formatted and addresses
+	#will work. so by setting it to 0x1000, this means it will start loading at 0x1000? (i.e. the first page will start at 
+	#0x1000
+	$(LD) $(LDFLAGS) -N -e main -Ttext 0x1000 -o $@ $^
 	$(OBJDUMP) -S $@ > $*.asm
 	$(OBJDUMP) -t $@ | sed '1,/SYMBOL TABLE/d; s/ .* / /; /^$$/d' > $*.sym
 
 _forktest: forktest.o $(ULIB)
 	# forktest has less library code linked in - needs to be small
 	# in order to be able to max out the proc table.
-	$(LD) $(LDFLAGS) -N -e main -Ttext 0 -o _forktest forktest.o ulib.o usys.o
+	
+	#compiler ahs to know how programs will be loaded in (work with OS on how b9naries will be formatted and addresses
+	#will work. so by setting it to 0x1000, this means it will start loading at 0x1000? (i.e. the first page will start at 
+	#0x1000
+	$(LD) $(LDFLAGS) -N -e main -Ttext 0x1000 -o _forktest forktest.o ulib.o usys.o
 	$(OBJDUMP) -S _forktest > forktest.asm
 
 mkfs: mkfs.c fs.h
@@ -217,7 +225,7 @@ QEMUGDB = $(shell if $(QEMU) -help | grep -q '^-gdb'; \
 	then echo "-gdb tcp::$(GDBPORT)"; \
 	else echo "-s -p $(GDBPORT)"; fi)
 ifndef CPUS
-CPUS := 2
+CPUS := 1
 endif
 QEMUOPTS = -drive file=fs.img,index=1,media=disk,format=raw -drive file=xv6.img,index=0,media=disk,format=raw -smp $(CPUS) -m 512 $(QEMUEXTRA)
 

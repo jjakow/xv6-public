@@ -39,7 +39,15 @@ exec(char *path, char **argv)
     goto bad;
 
   // Load program into memory.
-  sz = 0;
+  
+  //make change to trap 0xffffff
+   //sz = 0;
+
+   //moves the program to the start of the next page.   
+   sz = 0x1000;
+  //when memory is allocated for process
+   //3rd page starts at 0x2000, 4th at 0x3000 and so on...
+  //don't want to start at 0th page because that would imply 0 is a valid address and that is something we want to fix
   for(i=0, off=elf.phoff; i<elf.phnum; i++, off+=sizeof(ph)){
     if(readi(ip, (char*)&ph, off, sizeof(ph)) != sizeof(ph))
       goto bad;
