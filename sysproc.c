@@ -6,6 +6,30 @@
 #include "memlayout.h"
 #include "mmu.h"
 #include "proc.h"
+#include "vm.h"
+
+//need to invlucce header created
+
+
+int 
+sys_mprotect(void){
+    int len = 0;
+    void * addr;
+    argint(1, &len); 
+    argptr(0, (void *) &addr, len);
+    return mprotect(addr,len, myproc()->pgdir);
+    
+}
+
+
+int 
+sys_munprotect(void){
+    int len = 0;
+    void * addr;
+    argint(1, &len); 
+    argptr(0, (void *) &addr, len);
+    return munprotect(addr,len, myproc()->pgdir);
+}
 
 int
 sys_fork(void)
