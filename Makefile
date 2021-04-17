@@ -190,6 +190,7 @@ UPROGS=\
 	_wc\
 	_zombie\
 	_bad_zero_pointer\
+	_memory_protection_test\
 
 fs.img: mkfs README $(UPROGS)
 	./mkfs fs.img README $(UPROGS)

@@ -321,7 +321,7 @@ mprotect(void * addr,int len,pde_t* pgdir){
 		//walkpgdir sets permissions on pages
 		//this is a way of setting the permissions. smallest 3 bits are protection bits.
 		//for allocated pages always want present and user, Write
-		*pte =  ( *pte & 0xfffffff8) | PTE_P | PTE_W | PTE_U;
+		*pte =  ( *pte & 0xfffffff8) | PTE_P | PTE_U;
 		// 0x  f     f     f    f    f     f     f      8
 		///   1111  1111   1111   1111  1111  1111   1111  1000
 		current_addr += PGSIZE;
@@ -380,7 +380,7 @@ munprotect(void * addr,int len,pde_t* pgdir){
 		//for allocated pages always want present and user.
 
 		//Write is NOT allowed in this case for memory unprotection
-		*pte =  ( *pte & 0xfffffff8) | PTE_P | PTE_U;
+		*pte =  ( *pte & 0xfffffff8) | PTE_P | PTE_W| PTE_U;
 		// 0x  f     f     f    f    f     f     f      8
 		///   1111  1111   1111   1111  1111  1111   1111  1000
 		current_addr += PGSIZE;
@@ -390,8 +390,6 @@ munprotect(void * addr,int len,pde_t* pgdir){
 	//reset base limit value to same value it already has
 	//otherwise, return zero to signify no issue
 	return 0;
-
-
 }
 
 
