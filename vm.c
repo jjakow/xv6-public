@@ -288,7 +288,7 @@ mprotect(void * addr,int len,pde_t* pgdir){
 	pte_t *pte;
 	//page table entry type.
 
-	//you have an adrresss. have to round that page down to beginning.
+	//you have an address. have to round that page down to beginning.
 
 	uint start_address;
 
@@ -346,7 +346,7 @@ munprotect(void * addr,int len,pde_t* pgdir){
 	pte_t *pte;
 	//page table entry type.
 
-	//you have an adrresss. have to round that page down to beginning.
+	//you have an address. have to round that page down to beginning.
 
 	uint start_address;
 
